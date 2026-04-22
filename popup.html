@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Footprints</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      /*
+       * Extension popups are square at the OS level; we clip the document to a rounded rect.
+       * clip-path + overflow-clip (and box-shadow instead of border) avoids square corner artifacts.
+       */
+      :root {
+        --popup-bg: #fff;
+        --popup-radius: 20px;
+        --primary-grass: #32a058;
+        --popup-btn-shadow:
+          0 1px 2px rgba(15, 23, 42, 0.06),
+          0 4px 14px rgba(15, 23, 42, 0.08);
+        --popup-btn-shadow-hover:
+          0 1px 3px rgba(15, 23, 42, 0.08),
+          0 6px 20px rgba(15, 23, 42, 0.1);
+        --popup-btn-shadow-disabled:
+          0 1px 2px rgba(15, 23, 42, 0.04),
+          0 2px 10px rgba(15, 23, 42, 0.06);
+        /* Dynamic reserve used by popup.js while Character list is open. */
+        --popup-dropdown-reserve: 0px;
+        --popup-settings-reserve: 80px;
+      }
+      html {
+        margin: 0;
+        padding: 0;
+        background: var(--popup-bg);
+        overflow: hidden;
+        border-radius: var(--popup-radius);
+        clip-path: inset(0 round var(--popup-radius));
+      }
+      body {
+        margin: 0;
+        padding: 0;
+        width: 324px;
+        box-sizing: border-box;
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        color: #1e293b;
+        background: var(--popup-bg);
+        border-radius: var(--popup-radius);
+        overflow: hidden;
+        overflow: clip;
+        clip-path: inset(0 round var(--popup-radius));
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+      }
+      .popup-shell {
+        position: relative;
+        border-radius: var(--popup-radius);
+        overflow: hidden;
+        overflow: clip;
+        clip-path: inset(0 round var(--popup-radius));
+        background: var(--popup-bg);
+      }
+      .popup-card {
+        overflow: visible;
+        background: var(--popup-bg);
+        padding: 14px 16px 16px;
+        box-shadow: none;
+        border: none;
+      }
+      html:has(#settings-overlay:not([hidden])) .popup-card {
+        padding-bottom: calc(16px + var(--popup-settings-reserve));
+      }
+      .popup-header-row {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 10px;
+        margin: 0 0 14px;
+        padding: 0 10px;
+      }
+      .popup-header-row h1 {
+        font-size: 15px;
+        margin: 0;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex: 1;
+        min-width: 0;
+      }
+      .mascot-picker {
+        display: flex;
+        align-items: flex-start;
+        justify-content: flex-start;
+        gap: 5px;
+        margin: 0 0 12px;
+        padding: 0;
+      }
+      .mascot-picker-label {
+        font-size: 11px;
+        color: #64748b;
+        white-space: nowrap;
+        padding-top: 10px;
+      }
+      .mascot-picker-wrap {
+        position: relative;
+        flex: 0 0 auto;
+        width: min(160px, 100%);
+        min-width: 0;
+      }
+      .mascot-picker-wrap.fp-open {
+        margin-bottom: calc(var(--popup-dropdown-reserve) + 6px);
+      }
+      .mascot-picker-trigger {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+        min-height: 34px;
+        padding: 5px 30px 5px 8px;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        background-color: #fff;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M2.5 4.25 6 7.75 9.5 4.25' stroke='%2364748b' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 11px center;
+        background-size: 12px 12px;
+        color: #334155;
+        font-size: 12px;
+        font-weight: 600;
+        font-family: inherit;
+        cursor: pointer;
+        text-align: left;
+      }
+      .mascot-picker-trigger:focus {
+        outline: none;
+      }
+      .mascot-picker-trigger:focus-visible {
+        border-color: var(--primary-grass);
+        box-shadow: 0 0 0 2px rgba(50, 160, 88, 0.4);
+      }
+      .mascot-picker-trigger-img {
+        width: 24px;
+        height: 24px;
+        object-fit: contain;
+        flex-shrink: 0;
+        pointer-events: none;
+      }
+      .mascot-picker-trigger-label {
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .mascot-picker-list {
+        position: absolute;
+        left: auto;
+        right: 0;
+        width: min(160px, 100%);
+        top: calc(100% + 4px);
+        z-index: 60;
+        margin: 0;
+        padding: 4px 0;
+        list-style: none;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        background: #fff;
+        box-shadow:
+          0 4px 12px rgba(15, 23, 42, 0.12),
+          0 1px 2px rgba(15, 23, 42, 0.06);
+        max-height: 220px;
+        overflow-y: auto;
+      }
+      .mascot-picker-list[hidden] {
+        display: none !important;
+      }
+      .mascot-picker-option {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        margin: 0;
+        padding: 8px 10px;
+        border: none;
+        background: transparent;
+        color: #334155;
+        font-size: 12px;
+        font-weight: 600;
+        font-family: inherit;
+        cursor: pointer;
+        text-align: left;
+      }
+      .mascot-picker-option:hover,
+      .mascot-picker-option:focus {
+        background: #f0fdf4;
+        outline: none;
+      }
+      .mascot-picker-option:focus-visible {
+        box-shadow: inset 0 0 0 2px rgba(50, 160, 88, 0.35);
+      }
+      .mascot-picker-option[aria-selected="true"] {
+        background: #ecfdf5;
+        color: #166534;
+      }
+      .mascot-picker-option-img {
+        width: 28px;
+        height: 28px;
+        object-fit: contain;
+        flex-shrink: 0;
+        pointer-events: none;
+      }
+      /* Header footprint icon */
+      .popup-replay-mark {
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 40px;
+      }
+      img.popup-human-prints {
+        width: 40px;
+        height: auto;
+        pointer-events: none;
+        opacity: 0.92;
+        display: block;
+        margin: 0;
+        object-fit: contain;
+      }
+      p.desc {
+        margin: 0 0 12px;
+        font-size: 12px;
+        line-height: 1.45;
+        color: #64748b;
+      }
+      .row {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+      button.primary {
+        flex: 1;
+        padding: 10px 12px;
+        border: none;
+        border-radius: 10px;
+        background: var(--primary-grass);
+        color: #fff;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        box-shadow:
+          0 1px 2px rgba(15, 23, 42, 0.08),
+          0 4px 14px rgba(50, 160, 88, 0.25);
+      }
+      button.primary:hover:not(:disabled) {
+        filter: brightness(1.05);
+        box-shadow:
+          0 1px 3px rgba(15, 23, 42, 0.1),
+          0 6px 20px rgba(50, 160, 88, 0.32);
+      }
+      button.primary:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+        filter: none;
+        box-shadow:
+          0 1px 2px rgba(15, 23, 42, 0.05),
+          0 2px 10px rgba(50, 160, 88, 0.12);
+      }
+      button.icon-btn {
+        width: 40px;
+        height: 36px;
+        padding: 0;
+        border: 1px solid rgba(50, 160, 88, 0.35);
+        border-radius: 10px;
+        background: #fff;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary-grass);
+        box-shadow: var(--popup-btn-shadow);
+      }
+      button.icon-btn:hover {
+        background: #f0fdf4;
+        color: #27854a;
+        filter: none;
+        box-shadow: var(--popup-btn-shadow-hover);
+        border-color: rgba(50, 160, 88, 0.5);
+      }
+      .stats {
+        font-size: 11px;
+        color: #475569;
+        background: rgba(255, 255, 255, 0.8);
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 8px 10px;
+        min-height: 36px;
+        line-height: 1.4;
+      }
+      .peer-tab-row {
+        margin: 8px 0 0;
+      }
+      .peer-tab-row[hidden] {
+        display: none !important;
+      }
+      button.peer-tab-jump {
+        width: 100%;
+        padding: 9px 12px;
+        border-radius: 10px;
+        border: 1px solid rgba(50, 160, 88, 0.45);
+        background: #f0fdf4;
+        color: #166534;
+        font-size: 12px;
+        font-weight: 700;
+        font-family: inherit;
+        cursor: pointer;
+        box-shadow: var(--popup-btn-shadow);
+      }
+      button.peer-tab-jump:hover {
+        background: #dcfce7;
+        border-color: rgba(50, 160, 88, 0.6);
+        box-shadow: var(--popup-btn-shadow-hover);
+      }
+      .err {
+        color: #b91c1c;
+        font-size: 11px;
+        margin-top: 6px;
+      }
+      /* Settings overlay (same palette as the main card) */
+      .settings-overlay {
+        position: absolute;
+        inset: 0;
+        z-index: 50;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      .settings-overlay[hidden] {
+        display: none !important;
+      }
+      .settings-overlay-backdrop {
+        position: absolute;
+        inset: 0;
+        background: transparent;
+        cursor: pointer;
+      }
+      .settings-panel {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        max-height: min(420px, 100%);
+        overflow: auto;
+        background: var(--popup-bg);
+        border-radius: 0;
+        padding: 14px 16px 16px;
+        box-shadow: none;
+        border: none;
+        box-sizing: border-box;
+      }
+      .settings-panel-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        margin: 0 0 14px;
+      }
+      .settings-panel-header h2 {
+        margin: 0;
+        font-size: 15px;
+        font-weight: 700;
+        color: #1e293b;
+      }
+      .settings-close {
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        border: none;
+        border-radius: 8px;
+        background: #f1f5f9;
+        color: #64748b;
+        font-size: 20px;
+        line-height: 1;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .settings-close:hover {
+        background: #e2e8f0;
+        color: #334155;
+      }
+      .settings-toggle-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin: 0 0 8px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 600;
+        color: #334155;
+      }
+      .settings-toggle {
+        position: relative;
+        flex-shrink: 0;
+        width: 40px;
+        height: 22px;
+        margin-inline-end: 100px;
+      }
+      .settings-toggle-input {
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        width: 40px;
+        height: 22px;
+        margin: 0;
+        opacity: 0;
+        cursor: pointer;
+        accent-color: var(--primary-grass);
+      }
+      .settings-toggle-track {
+        position: absolute;
+        inset: 0;
+        border-radius: 10px;
+        background: #e2e8f0;
+        border: 1px solid #cbd5e1;
+        box-sizing: border-box;
+        transition:
+          background 0.15s ease,
+          border-color 0.15s ease;
+        pointer-events: none;
+      }
+      .settings-toggle-input:checked + .settings-toggle-track {
+        background: var(--primary-grass);
+        border-color: rgba(50, 160, 88, 0.55);
+      }
+      .settings-toggle-thumb {
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        width: 16px;
+        height: 16px;
+        border-radius: 6px;
+        background: #fff;
+        box-shadow:
+          0 1px 2px rgba(15, 23, 42, 0.12),
+          0 1px 3px rgba(15, 23, 42, 0.08);
+        transition: transform 0.18s ease;
+        pointer-events: none;
+      }
+      .settings-toggle-input:checked ~ .settings-toggle-thumb {
+        transform: translateX(18px);
+      }
+      .settings-toggle-input:focus-visible + .settings-toggle-track {
+        box-shadow: 0 0 0 2px rgba(50, 160, 88, 0.45);
+      }
+      .settings-hint {
+        margin: 0 0 16px;
+        font-size: 11px;
+        line-height: 1.45;
+        color: #64748b;
+      }
+      .settings-range-label {
+        display: block;
+        font-size: 12px;
+        font-weight: 600;
+        color: #334155;
+        margin: 0 0 8px;
+      }
+      .settings-range-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 0 0 16px;
+      }
+      .settings-range-row input[type='range'] {
+        flex: 1;
+        min-width: 0;
+        margin: 0;
+        accent-color: var(--primary-grass);
+      }
+      .settings-range-value {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--primary-grass);
+        min-width: 1.25rem;
+        text-align: right;
+        margin-inline-start: -11px;
+      }
+      button.settings-done {
+        width: 100%;
+        margin: 14px 0 0;
+      }
+      /* Square chrome while Settings is open (see popup.js fp-settings-square) */
+      html.fp-settings-square {
+        border-radius: 0;
+        clip-path: none;
+      }
+      html.fp-settings-square body {
+        border-radius: 0;
+        clip-path: none;
+      }
+      html.fp-settings-square .popup-shell {
+        border-radius: 0;
+        clip-path: none;
+      }
+      html.fp-settings-square .settings-close {
+        border-radius: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="popup-shell">
+    <div class="popup-card">
+    <div class="popup-header-row">
+      <h1>
+        <span class="popup-replay-mark">
+          <img
+            class="popup-human-prints"
+            src="icons/footprints-human-pair.png"
+            alt=""
+            width="88"
+            height="72"
+            decoding="async"
+          />
+        </span>
+        Footprints
+      </h1>
+    </div>
+    <div class="mascot-picker">
+      <label class="mascot-picker-label" id="fp-mascot-label" for="fp-mascot-pick">Character</label>
+      <div class="mascot-picker-wrap">
+        <button
+          type="button"
+          id="fp-mascot-pick"
+          class="mascot-picker-trigger"
+          aria-haspopup="listbox"
+          aria-expanded="false"
+          aria-controls="fp-mascot-listbox"
+          aria-labelledby="fp-mascot-label"
+        >
+          <img class="mascot-picker-trigger-img" src="" alt="" width="24" height="24" decoding="async" />
+          <span class="mascot-picker-trigger-label"></span>
+        </button>
+        <div id="fp-mascot-listbox" class="mascot-picker-list" role="listbox" aria-labelledby="fp-mascot-label" hidden></div>
+      </div>
+    </div>
+    <p class="desc">
+      See a short replay of your last meaningful clicks and pauses on this tab. Local only, not a screen
+      recording.
+    </p>
+    <div class="row">
+      <button type="button" class="primary" id="replay" disabled>Retrace My Footsteps</button>
+      <button type="button" class="icon-btn" id="settings" title="Settings" aria-label="Open settings">
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path
+            d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"
+          />
+          <circle cx="12" cy="12" r="3" />
+        </svg>
+      </button>
+    </div>
+    <div class="stats" id="stats" hidden></div>
+    <div class="peer-tab-row" id="peer-tab-row" hidden>
+      <button type="button" class="peer-tab-jump" id="peer-tab-jump">Switch to that tab</button>
+    </div>
+    <div class="err" id="err" hidden></div>
+    <div id="settings-overlay" class="settings-overlay" hidden aria-hidden="true">
+      <div class="settings-overlay-backdrop" id="settings-backdrop" tabindex="-1" aria-hidden="true"></div>
+      <div
+        class="settings-panel"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="settings-title"
+      >
+        <div class="settings-panel-header">
+          <h2 id="settings-title">Settings</h2>
+          <button type="button" class="settings-close" id="settings-close" aria-label="Close settings">
+            ×
+          </button>
+        </div>
+        <label class="settings-toggle-row">
+          <span>Show widget on pages</span>
+          <span class="settings-toggle">
+            <input type="checkbox" id="fp-setting-show-launcher" class="settings-toggle-input" checked />
+            <span class="settings-toggle-track" aria-hidden="true"></span>
+            <span class="settings-toggle-thumb" aria-hidden="true"></span>
+          </span>
+        </label>
+        <p class="settings-hint">
+          Turn off to hide the widget on pages. It still appears while a retrace is playing. You can start
+          retrace from this popup or the keyboard shortcut (cmd + shift + e).
+        </p>
+        <label class="settings-range-label" for="fp-setting-max-actions">Past actions to store</label>
+        <div class="settings-range-row">
+          <input
+            type="range"
+            id="fp-setting-max-actions"
+            min="3"
+            max="10"
+            step="1"
+            value="4"
+            aria-valuemin="3"
+            aria-valuemax="10"
+          />
+          <span id="fp-setting-max-value" class="settings-range-value">4</span>
+        </div>
+        <p class="settings-hint" style="margin-top: -6px; margin-bottom: 12px">
+          Replay uses your last stored clicks and pauses on this tab (minimum 3, maximum 10).
+        </p>
+        <button type="button" class="primary settings-done" id="settings-done">Done</button>
+      </div>
+    </div>
+    <script src="animals.js"></script>
+    <script src="popup.js"></script>
+    </div>
+    </div>
+  </body>
+</html>

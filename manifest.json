@@ -1,0 +1,72 @@
+{
+  "manifest_version": 3,
+  "name": "Footprints – Instantly Retrace Your Steps",
+  "version": "1.0.0",
+  "description": "Lightweight visual replay of your last meaningful actions on a page. Resume tasks easily without screen recording.",
+  "permissions": ["storage", "tabs"],
+  "host_permissions": ["http://*/*", "https://*/*"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Footprints",
+    "default_icon": {
+      "16": "icons/footprints-human-pair.png",
+      "32": "icons/footprints-human-pair.png",
+      "48": "icons/footprints-human-pair.png",
+      "128": "icons/footprints-human-pair.png"
+    }
+  },
+  "commands": {
+    "start_replay": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+E",
+        "mac": "Command+Shift+E"
+      },
+      "description": "Start or stop retrace (on-page replay overlay on this tab)"
+    }
+  },
+  "icons": {
+    "16": "icons/footprints-human-pair.png",
+    "32": "icons/footprints-human-pair.png",
+    "48": "icons/footprints-human-pair.png",
+    "128": "icons/footprints-human-pair.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["animals.js", "utils.js", "content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "overlay.css",
+        "floating-bunny-chew.css",
+        "icons/mascot-256.png",
+        "icons/mascot-fox.png",
+        "icons/mascot-raccoon.png",
+        "icons/mascot-owl.png",
+        "icons/raccoon-trash-heap.png",
+        "videos/bunny-walk-right.m4v",
+        "videos/bunny-walk-straight.m4v",
+        "videos/bunny-walk-away.m4v",
+        "videos/bunny-eating.m4v",
+        "videos/fox-walk-straight.m4v",
+        "videos/fox-walk-left.m4v",
+        "videos/fox-walk-away-left.m4v",
+        "videos/fox-walk-away-right.m4v",
+        "videos/fox-eating.m4v",
+        "videos/owl-eating.m4v",
+        "videos/owl-flying-left.m4v",
+        "videos/owl-flying-away.m4v",
+        "videos/raccoon-eating.m4v",
+        "videos/raccoon-walk-away.m4v",
+        "videos/raccoon-walk-right.m4v"
+      ],
+      "matches": ["http://*/*", "https://*/*"]
+    }
+  ]
+}

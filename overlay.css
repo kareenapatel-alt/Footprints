@@ -1,0 +1,716 @@
+/**
+ * Footprints – overlay UI. EVERY selector is scoped under #footprints-overlay-root,
+ * #footprints-navigate-gate, #footprints-opener-gate, #footprints-link-hint-root
+ * so this sheet never styles normal page links/buttons.
+ */
+
+/* Floating launcher: most styling is inline in content.js (sky + grass + circle). */
+#footprints-floating-bunny {
+  position: fixed;
+  z-index: 2147483644;
+  border: none;
+  padding: 0;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+
+#footprints-floating-bunny.footprints-dragging {
+  cursor: grabbing;
+}
+
+/* Retrace: vertical pill — white panel, green border, glow; mascot + arrows + Stay in column. */
+#footprints-floating-bunny.footprints-fab-retrace-card .footprints-fab-replay-arrows {
+  position: static !important;
+  left: auto !important;
+  top: auto !important;
+  transform: none !important;
+  margin-top: 0 !important;
+  gap: 14px !important;
+  color: #2a9d4f !important;
+}
+
+#footprints-floating-bunny.footprints-fab-retrace-card .footprints-fab-replay-arrows svg {
+  width: 44px !important;
+  height: 24px !important;
+  stroke-width: 3.25px !important;
+  filter: drop-shadow(0 2px 3px rgba(50, 160, 88, 0.35)) !important;
+}
+
+#footprints-floating-bunny.footprints-fab-retrace-card .footprints-fab-replay-stay-wrap {
+  position: static !important;
+  left: auto !important;
+  top: auto !important;
+  transform: none !important;
+  margin-top: 0 !important;
+  max-width: min(260px, calc(100vw - 24px)) !important;
+}
+
+#footprints-floating-bunny.footprints-fab-retrace-card .footprints-fab-replay-stay {
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  color: #1d6b3d !important;
+}
+
+#footprints-floating-bunny .footprints-floating-bunny-img {
+  object-fit: contain;
+  object-position: center bottom;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 6px rgba(15, 35, 12, 0.22));
+}
+
+/* ↔ stroke arrows under the widget while hop replay is active (theme green) */
+#footprints-floating-bunny .footprints-fab-replay-arrows {
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  transform: translateX(-50%);
+  margin-top: 4px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  pointer-events: auto;
+  z-index: 10;
+  color: #32a058;
+  line-height: 0;
+}
+
+#footprints-floating-bunny .footprints-fab-replay-arrow-btn {
+  all: unset;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 4px 6px;
+  border-radius: 10px;
+  cursor: pointer;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#footprints-floating-bunny .footprints-fab-replay-arrow-keyhint {
+  font: 600 10px/1 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  color: #2a9d4f;
+  opacity: 0.9;
+  letter-spacing: 0.01em;
+  pointer-events: none;
+  user-select: none;
+}
+
+#footprints-floating-bunny .footprints-fab-replay-arrow-btn:focus-visible {
+  outline: 2px solid rgba(50, 160, 88, 0.85);
+  outline-offset: 2px;
+}
+
+#footprints-floating-bunny .footprints-fab-replay-arrow-btn:hover {
+  background: rgba(50, 160, 88, 0.12);
+}
+
+#footprints-floating-bunny .footprints-fab-replay-arrow-btn:active {
+  background: rgba(50, 160, 88, 0.2);
+}
+
+#footprints-floating-bunny .footprints-fab-replay-arrow-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+#footprints-floating-bunny .footprints-fab-replay-arrow-btn:disabled:hover,
+#footprints-floating-bunny .footprints-fab-replay-arrow-btn:disabled:active {
+  background: transparent;
+}
+
+#footprints-floating-bunny .footprints-fab-replay-arrow-btn:disabled svg {
+  animation: none !important;
+}
+
+#footprints-floating-bunny .footprints-fab-replay-arrow-btn:disabled
+  .footprints-fab-replay-arrow-keyhint {
+  opacity: 0.75;
+}
+
+#footprints-floating-bunny .footprints-fab-replay-arrows svg {
+  width: 38px;
+  height: 21px;
+  display: block;
+  flex-shrink: 0;
+  overflow: visible;
+  pointer-events: none;
+  filter: drop-shadow(0 1px 2px rgba(50, 160, 88, 0.3));
+  animation: footprints-fab-replay-arrows-pulse 0.9s ease-in-out infinite !important;
+}
+
+/* Retrace mode: keep the launcher visually calm (no chew, carrot/worm/berries/trash motion, arrow pulse). */
+#footprints-floating-bunny.footprints-fab-replay-quiet .footprints-fab-replay-arrows svg {
+  animation: none !important;
+}
+
+#footprints-floating-bunny.footprints-fab-replay-quiet .fp-chew-stage,
+#footprints-floating-bunny.footprints-fab-replay-quiet .fp-chew-stage .footprints-floating-bunny-img,
+#footprints-floating-bunny.footprints-fab-replay-quiet .fp-chew-carrot,
+#footprints-floating-bunny.footprints-fab-replay-quiet .fp-chew-carrot-sway,
+#footprints-floating-bunny.footprints-fab-replay-quiet .fp-owl-worm,
+#footprints-floating-bunny.footprints-fab-replay-quiet .fp-owl-worm-sway,
+#footprints-floating-bunny.footprints-fab-replay-quiet .fp-fox-berries-wrap .fp-fox-berry-cluster-inner,
+#footprints-floating-bunny.footprints-fab-replay-quiet .fp-raccoon-trash-heap-inner {
+  animation: none !important;
+}
+
+#footprints-floating-bunny .footprints-fab-replay-stay-wrap {
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  transform: translateX(-50%);
+  margin-top: 36px;
+  z-index: 10;
+  pointer-events: auto;
+  max-width: min(240px, calc(100vw - 24px));
+}
+
+#footprints-floating-bunny .footprints-fab-replay-stay {
+  all: unset;
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  text-align: center;
+  font: 600 12px/1.25 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  color: #1d6b3d;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 10px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#footprints-floating-bunny .footprints-fab-replay-stay:hover {
+  color: #145a32;
+  background: rgba(50, 160, 88, 0.08);
+}
+
+#footprints-floating-bunny .footprints-fab-replay-stay:focus-visible {
+  outline: 2px solid rgba(50, 160, 88, 0.85);
+  outline-offset: 2px;
+}
+
+@keyframes footprints-fab-replay-arrows-pulse {
+  0%,
+  100% {
+    opacity: 0.88;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Done (upper right) */
+#footprints-overlay-root .footprints-overlay-top-right {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 12;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+}
+
+#footprints-overlay-root .footprints-overlay-top-right .footprints-dismiss {
+  position: static;
+  pointer-events: auto;
+}
+
+#footprints-overlay-root.footprints-root {
+  --fp-bg-scrim: rgba(15, 23, 42, 0.52);
+  --fp-highlight: rgba(74, 180, 108, 0.45);
+  --fp-foot: rgba(120, 53, 15, 0.55);
+  --fp-rabbit-w: 76px;
+  --fp-rabbit-h: 76px;
+  --fp-font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  position: fixed;
+  inset: 0;
+  z-index: 2147483646;
+  pointer-events: none;
+  font-family: var(--fp-font);
+}
+
+#footprints-overlay-root.footprints-compact-replay {
+  pointer-events: none;
+  /* Slightly darker than full replay so the page reads dimmed during retrace. */
+  --fp-bg-scrim: rgba(10, 16, 32, 0.58);
+}
+
+#footprints-overlay-root.footprints-compact-replay .footprints-scrim {
+  pointer-events: none !important;
+}
+
+#footprints-overlay-root.footprints-compact-replay .footprints-label {
+  background: rgba(255, 255, 255, 0.95);
+  pointer-events: none;
+}
+
+#footprints-overlay-root.footprints-root.footprints-interactive {
+  pointer-events: auto;
+  --fp-bg-scrim: rgba(10, 16, 32, 0.62);
+}
+
+#footprints-overlay-root .footprints-scrim {
+  position: absolute;
+  inset: 0;
+  background: var(--fp-bg-scrim);
+  opacity: 0;
+  animation: footprints-fade-in 0.45s ease forwards;
+}
+
+#footprints-overlay-root.footprints-root.footprints-dismissed .footprints-scrim {
+  animation: footprints-fade-out 0.35s ease forwards;
+}
+
+@keyframes footprints-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes footprints-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+#footprints-overlay-root .footprints-rabbit-wrap {
+  position: absolute;
+  width: var(--fp-rabbit-w);
+  height: var(--fp-rabbit-h);
+  margin-left: calc(var(--fp-rabbit-w) / -2);
+  margin-top: calc(var(--fp-rabbit-h) / -2);
+  pointer-events: none;
+  z-index: 24;
+  border: none;
+  outline: none;
+  background: transparent;
+  box-shadow: none;
+  /* Lift sprite so path anchor sits near “feet”; scroll is clamped so this stays on-screen */
+  transform: translateY(-52px);
+  transition: none;
+}
+
+/* Hop keyframes kept for possible future use; replay uses smooth slide only */
+#footprints-overlay-root .footprints-rabbit-wrap.footprints-hop {
+  animation: footprints-hop 0.48s cubic-bezier(0.28, 0.82, 0.38, 1);
+}
+
+/* Baseline -52px matches .footprints-rabbit-wrap so hop anim stacks correctly */
+@keyframes footprints-hop {
+  0% {
+    transform: translateY(-52px) scale(1, 1);
+  }
+  28% {
+    transform: translateY(-86px) scale(1.08, 1.14);
+  }
+  55% {
+    transform: translateY(-64px) scale(1.03, 1.06);
+  }
+  100% {
+    transform: translateY(-52px) scale(1, 1);
+  }
+}
+
+#footprints-overlay-root .footprints-rabbit-mascot {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  object-position: center center;
+  pointer-events: none;
+  -webkit-user-drag: none;
+  border: none;
+  outline: none;
+  box-shadow: none;
+  background: transparent;
+  background-color: transparent;
+  /* Glow follows the PNG alpha — avoids a square halo from the wrap box */
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.14))
+    drop-shadow(0 0 22px rgba(90, 195, 130, 0.52))
+    drop-shadow(0 0 40px rgba(50, 160, 88, 0.32));
+  -webkit-filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.14))
+    drop-shadow(0 0 22px rgba(90, 195, 130, 0.52))
+    drop-shadow(0 0 40px rgba(50, 160, 88, 0.32));
+}
+
+#footprints-overlay-root video.footprints-raccoon-retrace-video,
+#footprints-overlay-root canvas.footprints-raccoon-retrace-video {
+  background: transparent;
+  background-color: transparent;
+  mix-blend-mode: multiply;
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.32)) drop-shadow(0 0 14px rgba(42, 122, 78, 0.42));
+}
+
+#footprints-overlay-root .footprints-footprint {
+  position: absolute;
+  width: 18px;
+  height: 22px;
+  margin-left: -9px;
+  margin-top: -11px;
+  opacity: 0;
+  animation: footprints-foot-appear 0.5s ease forwards;
+  pointer-events: none;
+}
+
+@keyframes footprints-foot-appear {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+#footprints-overlay-root .footprints-footprint svg {
+  width: 100%;
+  height: 100%;
+  fill: var(--fp-foot);
+}
+
+#footprints-overlay-root .footprints-footprints-layer {
+  z-index: 22;
+  overflow: visible;
+}
+
+#footprints-overlay-root .footprints-trail-wrap {
+  position: absolute;
+  pointer-events: none;
+}
+
+#footprints-overlay-root .footprints-trail-inner {
+  width: 17px;
+  height: 23px;
+  transform-origin: 50% 82%;
+  opacity: 0.95;
+}
+
+#footprints-overlay-root .footprints-trail-inner svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+#footprints-overlay-root .footprints-dismiss {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #1e293b;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  pointer-events: auto;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+}
+
+#footprints-overlay-root .footprints-dismiss:hover {
+  background: #fff;
+}
+
+#footprints-overlay-root .footprints-dismiss:focus-visible {
+  outline: 2px solid rgba(148, 163, 184, 0.85);
+  outline-offset: 2px;
+}
+
+#footprints-overlay-root .footprints-label {
+  position: absolute;
+  left: 16px;
+  top: 16px;
+  z-index: 6;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.88);
+  color: #334155;
+  font-size: 12px;
+  font-weight: 600;
+  pointer-events: none;
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.08);
+}
+
+/*
+ * Navigate + opener gates — !important so host resets cannot wash out panel text.
+ */
+#footprints-navigate-gate.footprints-root,
+#footprints-opener-gate.footprints-root {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 2147483646 !important;
+  pointer-events: auto !important;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif !important;
+  box-sizing: border-box !important;
+}
+
+#footprints-navigate-gate.footprints-root *,
+#footprints-navigate-gate.footprints-root *::before,
+#footprints-navigate-gate.footprints-root *::after,
+#footprints-opener-gate.footprints-root *,
+#footprints-opener-gate.footprints-root *::before,
+#footprints-opener-gate.footprints-root *::after {
+  box-sizing: border-box !important;
+}
+
+#footprints-navigate-gate .footprints-scrim,
+#footprints-opener-gate .footprints-scrim {
+  position: absolute !important;
+  inset: 0 !important;
+  background: rgba(15, 23, 42, 0.36) !important;
+  z-index: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+}
+
+#footprints-navigate-gate .footprints-gate-panel,
+#footprints-opener-gate .footprints-gate-panel {
+  position: fixed !important;
+  left: 50% !important;
+  top: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  z-index: 1 !important;
+  max-width: 340px !important;
+  width: calc(100vw - 32px) !important;
+  padding: 20px 22px !important;
+  margin: 0 !important;
+  background: #1c1917 !important;
+  color: #fafaf9 !important;
+  border-radius: 14px !important;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35) !important;
+  font-size: 15px !important;
+  line-height: 1.45 !important;
+  border: none !important;
+}
+
+#footprints-navigate-gate .footprints-gate-msg,
+#footprints-opener-gate .footprints-gate-msg {
+  margin: 0 0 14px !important;
+  padding: 0 !important;
+  color: #fafaf9 !important;
+  font-size: 15px !important;
+  line-height: 1.45 !important;
+  font-weight: 400 !important;
+  font-family: inherit !important;
+  border: none !important;
+  background: transparent !important;
+}
+
+#footprints-navigate-gate .footprints-gate-actions,
+#footprints-opener-gate .footprints-gate-actions {
+  display: flex !important;
+  gap: 10px !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  margin: 4px 0 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+}
+
+/* Shared: kill host page + UA button chrome so both actions match size and radius */
+#footprints-navigate-gate .footprints-gate-secondary,
+#footprints-opener-gate .footprints-gate-secondary,
+#footprints-navigate-gate .footprints-gate-primary,
+#footprints-opener-gate .footprints-gate-primary {
+  box-sizing: border-box !important;
+  min-height: 42px !important;
+  padding: 0 14px !important;
+  border-radius: 10px !important;
+  font-family: inherit !important;
+  font-size: 13px !important;
+  line-height: 1.2 !important;
+  cursor: pointer !important;
+  margin: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+}
+
+#footprints-navigate-gate .footprints-gate-secondary,
+#footprints-opener-gate .footprints-gate-secondary {
+  border: 1px solid #a8a29e !important;
+  background: transparent !important;
+  color: #fafaf9 !important;
+  font-weight: 600 !important;
+  box-shadow: none !important;
+}
+
+#footprints-navigate-gate .footprints-gate-secondary:hover,
+#footprints-opener-gate .footprints-gate-secondary:hover {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-color: #d6d3d1 !important;
+}
+
+#footprints-navigate-gate .footprints-gate-primary,
+#footprints-opener-gate .footprints-gate-primary {
+  border: 1px solid transparent !important;
+  background: #32a058 !important;
+  color: #fff !important;
+  font-weight: 700 !important;
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.06),
+    0 4px 20px rgba(50, 160, 88, 0.28) !important;
+}
+
+#footprints-navigate-gate .footprints-gate-primary:hover,
+#footprints-opener-gate .footprints-gate-primary:hover {
+  filter: brightness(1.05);
+  box-shadow:
+    0 1px 3px rgba(15, 23, 42, 0.07),
+    0 6px 26px rgba(50, 160, 88, 0.36) !important;
+}
+
+/* Single-point “opened from this link” hint on the parent tab */
+#footprints-link-hint-root.footprints-root {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 2147483646 !important;
+  pointer-events: auto !important;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif !important;
+}
+
+#footprints-link-hint-root .footprints-scrim {
+  position: absolute !important;
+  inset: 0 !important;
+  background: rgba(15, 23, 42, 0.28) !important;
+  z-index: 0 !important;
+}
+
+#footprints-link-hint-root .footprints-rabbit-wrap {
+  position: absolute !important;
+  width: var(--fp-rabbit-w, 76px) !important;
+  height: var(--fp-rabbit-h, 76px) !important;
+  margin-left: calc(var(--fp-rabbit-w, 76px) / -2) !important;
+  margin-top: calc(var(--fp-rabbit-h, 76px) / -2) !important;
+  transform: translateY(-52px) !important;
+  pointer-events: none !important;
+  z-index: 24 !important;
+  border: none !important;
+  outline: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+#footprints-link-hint-root .footprints-rabbit-mascot {
+  width: 100% !important;
+  height: 100% !important;
+  display: block !important;
+  object-fit: contain !important;
+  pointer-events: none !important;
+  border: none !important;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.14))
+    drop-shadow(0 0 22px rgba(90, 195, 130, 0.52))
+    drop-shadow(0 0 40px rgba(50, 160, 88, 0.28)) !important;
+}
+
+#footprints-link-hint-root .footprints-footprints-layer {
+  z-index: 22 !important;
+  position: absolute !important;
+  inset: 0 !important;
+  pointer-events: none !important;
+  overflow: visible !important;
+}
+
+#footprints-link-hint-root .footprints-trail-wrap {
+  position: absolute !important;
+  pointer-events: none !important;
+}
+
+#footprints-link-hint-root .footprints-trail-inner {
+  width: 17px !important;
+  height: 23px !important;
+  transform-origin: 50% 82% !important;
+  opacity: 0.95 !important;
+}
+
+#footprints-link-hint-root .footprints-trail-inner svg {
+  width: 100% !important;
+  height: 100% !important;
+  display: block !important;
+}
+
+#footprints-link-hint-root .footprints-link-hint-label {
+  position: absolute !important;
+  left: 16px !important;
+  top: 16px !important;
+  z-index: 6 !important;
+  max-width: min(320px, calc(100vw - 32px)) !important;
+  padding: 8px 12px !important;
+  border-radius: 8px !important;
+  background: rgba(255, 255, 255, 0.92) !important;
+  color: #334155 !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  line-height: 1.4 !important;
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.1) !important;
+  pointer-events: none !important;
+}
+
+#footprints-link-hint-root .footprints-dismiss {
+  position: absolute !important;
+  top: 16px !important;
+  right: 16px !important;
+  z-index: 12 !important;
+  padding: 8px 14px !important;
+  border: none !important;
+  border-radius: 999px !important;
+  background: rgba(255, 255, 255, 0.92) !important;
+  color: #1e293b !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12) !important;
+}
+
+/*
+ * Decoder <video> under a keyed <canvas>: transparent canvas pixels must not reveal WebKit’s
+ * default media controls (blue progress strip). drawImage still works when the element is hidden.
+ */
+video.fp-bunny-walk-matte-src,
+video.fp-fox-walk-matte-src,
+video.fp-raccoon-walk-matte-src,
+video.fp-raccoon-eating-src,
+video.fp-bunny-eating-src,
+video.fp-fox-eating-src,
+video.fp-owl-eating-src {
+  visibility: hidden !important;
+}
+
+video.fp-bunny-walk-matte-src::-webkit-media-controls,
+video.fp-bunny-walk-matte-src::-webkit-media-controls-enclosure,
+video.fp-fox-walk-matte-src::-webkit-media-controls,
+video.fp-fox-walk-matte-src::-webkit-media-controls-enclosure,
+video.fp-raccoon-walk-matte-src::-webkit-media-controls,
+video.fp-raccoon-walk-matte-src::-webkit-media-controls-enclosure,
+video.fp-raccoon-eating-src::-webkit-media-controls,
+video.fp-raccoon-eating-src::-webkit-media-controls-enclosure,
+video.fp-bunny-eating-src::-webkit-media-controls,
+video.fp-bunny-eating-src::-webkit-media-controls-enclosure,
+video.fp-fox-eating-src::-webkit-media-controls,
+video.fp-fox-eating-src::-webkit-media-controls-enclosure,
+video.fp-owl-eating-src::-webkit-media-controls,
+video.fp-owl-eating-src::-webkit-media-controls-enclosure {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
