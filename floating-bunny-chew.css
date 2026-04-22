@@ -1,0 +1,854 @@
+/**
+ * Footprints floating bunny — chew loop animation, scoped to the circular launcher.
+ * Activated when #footprints-floating-bunny gets .fp-chew-active (first scroll).
+ */
+
+#footprints-floating-bunny button .fp-floating-grass-wrap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 50%;
+  pointer-events: none;
+  z-index: 0;
+  overflow: visible;
+}
+#footprints-floating-bunny button .fp-floating-grass-wrap svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  z-index: 0;
+}
+
+#footprints-floating-bunny .fp-chew-stage {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 1;
+}
+
+#footprints-floating-bunny:not(.fp-chew-active) .fp-chew-stage {
+  animation: none;
+}
+
+#footprints-floating-bunny.fp-chew-active .fp-chew-stage {
+  animation: fpBunnyBiteBob 6s ease-in-out infinite;
+}
+
+/* Raccoon: eating H.264 clip replaces bob + trash heap during scroll-chew (video node is always in DOM). */
+#footprints-floating-bunny.fp-chew-active:has(.fp-raccoon-eating-video) .fp-chew-stage {
+  animation: none !important;
+}
+#footprints-floating-bunny.fp-chew-active:has(.fp-bunny-eating-video) .fp-chew-stage {
+  animation: none !important;
+}
+#footprints-floating-bunny.fp-chew-active:has(.fp-fox-eating-video) .fp-chew-stage {
+  animation: none !important;
+}
+#footprints-floating-bunny.fp-chew-active:has(.fp-owl-eating-video) .fp-chew-stage {
+  animation: none !important;
+}
+#footprints-floating-bunny.fp-chew-active:has(.fp-raccoon-eating-video) .fp-raccoon-trash-heap {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  transition: opacity 0.2s ease, visibility 0.2s ease !important;
+}
+#footprints-floating-bunny.fp-chew-active:has(.fp-raccoon-eating-video) .fp-raccoon-trash-heap-inner {
+  animation: none !important;
+}
+#footprints-floating-bunny.fp-chew-active:has(.fp-bunny-eating-video) .fp-chew-carrot {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+#footprints-floating-bunny.fp-chew-active:has(.fp-fox-eating-video) .fp-fox-berries-wrap {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  transition: opacity 0.2s ease, visibility 0.2s ease !important;
+}
+#footprints-floating-bunny.fp-chew-active:has(.fp-owl-eating-video) .fp-owl-worm {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+#footprints-floating-bunny .fp-chew-stage .footprints-floating-bunny-img {
+  position: relative;
+  z-index: 2;
+  display: block;
+  width: 88%;
+  height: 88%;
+  object-fit: contain;
+  object-position: center bottom;
+  margin-bottom: 1px;
+  filter: drop-shadow(0 2px 6px rgba(15, 35, 12, 0.22));
+  pointer-events: none;
+}
+
+/* Hidden decoder for raccoon eating clip (content.js draws keyed frames to the canvas). */
+#footprints-floating-bunny .fp-raccoon-eating-src {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  left: 0;
+  bottom: 0;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+/* Hidden decoder for bunny eating clip (content.js draws keyed frames to the canvas). */
+#footprints-floating-bunny .fp-bunny-eating-src {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  left: 0;
+  bottom: 0;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+/* Hidden decoder for fox eating clip (content.js draws keyed frames to the canvas). */
+#footprints-floating-bunny .fp-fox-eating-src {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  left: 0;
+  bottom: 0;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+/* Hidden decoder for owl eating clip (content.js draws keyed frames to the canvas). */
+#footprints-floating-bunny .fp-owl-eating-src {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  left: 0;
+  bottom: 0;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+/* Raccoon launcher: keyed eating frames (canvas) replace the static sprite while scroll-chew is active.
+   Slightly larger than the 88% static PNG so the animal in the clip matches perceived mascot size (video frame has more padding); scale tuned vs. static art. */
+#footprints-floating-bunny .fp-raccoon-eating-video {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  margin-left: 0;
+  transform: translate(-50%, 4px) translateZ(0) scale(1.04);
+  transform-origin: 50% 100%;
+  z-index: 3;
+  pointer-events: none;
+  display: none;
+  background: transparent;
+  object-fit: contain;
+  object-position: center bottom;
+  image-rendering: auto;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.28)) drop-shadow(0 0 10px rgba(42, 122, 78, 0.35));
+}
+
+/* Bunny launcher: keyed eating frames (canvas) replace static sprite while scroll-chew is active. */
+#footprints-floating-bunny .fp-bunny-eating-video {
+  position: absolute;
+  left: 50%;
+  bottom: 1px;
+  width: 88%;
+  height: 88%;
+  margin-left: 0;
+  transform: translateX(-50%) translateZ(0);
+  transform-origin: 50% 100%;
+  z-index: 3;
+  pointer-events: none;
+  display: none;
+  background: transparent;
+  object-fit: contain;
+  object-position: center bottom;
+  image-rendering: auto;
+  filter: drop-shadow(0 2px 6px rgba(15, 35, 12, 0.22));
+}
+
+/* Fox launcher: keyed eating frames (canvas) replace static sprite while scroll-chew is active. */
+#footprints-floating-bunny .fp-fox-eating-video {
+  position: absolute;
+  left: 50%;
+  bottom: 2px;
+  width: 100%;
+  height: 100%;
+  margin-left: 0;
+  transform: translate(-50%, -3px) translateZ(0) scale(1.04);
+  transform-origin: 50% 100%;
+  z-index: 3;
+  pointer-events: none;
+  display: none;
+  background: transparent;
+  object-fit: contain;
+  object-position: center bottom;
+  image-rendering: auto;
+  filter: drop-shadow(0 2px 6px rgba(15, 35, 12, 0.22));
+}
+
+/* Owl launcher: eating clip replaces static sprite while scroll-chew is active. */
+#footprints-floating-bunny .fp-owl-eating-video {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  margin-left: 0;
+  transform: translate(-50%, -1px) translateZ(0) scale(1.1);
+  transform-origin: 50% 100%;
+  z-index: 3;
+  pointer-events: none;
+  display: none;
+  background: transparent;
+  object-fit: contain;
+  object-position: center bottom;
+  image-rendering: auto;
+  filter: drop-shadow(0 2px 6px rgba(15, 35, 12, 0.22));
+}
+
+#footprints-floating-bunny .fp-chew-carrot {
+  position: absolute;
+  left: 50%;
+  bottom: 7px;
+  width: 13px;
+  height: 19px;
+  margin-left: 0;
+  z-index: 5;
+  transform: translateX(-50%);
+  transform-origin: 50% 100%;
+  animation: fpCarrotLift 6s linear infinite;
+}
+
+#footprints-floating-bunny .fp-chew-carrot-sway {
+  width: 100%;
+  height: 100%;
+  transform-origin: 50% 100%;
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.16));
+  clip-path: polygon(
+    0% 0%, 8.33% 0%, 16.66% 0%, 25% 0%, 33.33% 0%, 41.66% 0%, 50% 0%, 58.33% 0%,
+    66.66% 0%, 75% 0%, 83.33% 0%, 91.66% 0%, 100% 0%, 100% 100%, 0% 100%
+  );
+  animation: fpCarrotBitten 6s linear infinite;
+}
+
+#footprints-floating-bunny:not(.fp-chew-active) .fp-chew-carrot {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  animation: none;
+  transform: translateX(-50%) translateY(0);
+}
+
+#footprints-floating-bunny:not(.fp-chew-active) .fp-chew-carrot-sway {
+  animation: none;
+  transform: none;
+  clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+}
+
+#footprints-floating-bunny.fp-chew-active .fp-chew-carrot {
+  visibility: visible;
+  opacity: 1;
+  transition: opacity 0.45s ease;
+}
+
+#footprints-floating-bunny .fp-chew-carrot-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Owl FAB: worm hangs from beak (anchor top center), visible while scroll-chew active. */
+#footprints-floating-bunny .fp-owl-worm {
+  position: absolute;
+  left: 50%;
+  bottom: -1px;
+  width: 12px;
+  height: 28px;
+  margin-left: 0;
+  z-index: 5;
+  transform: translateX(-50%);
+  transform-origin: 50% 0;
+  animation: fpOwlWormHang 6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+#footprints-floating-bunny .fp-owl-worm-sway {
+  width: 100%;
+  height: 100%;
+  transform-origin: 50% 0;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.18));
+  animation: fpOwlWormDangle 6s ease-in-out infinite;
+}
+
+#footprints-floating-bunny:not(.fp-chew-active) .fp-owl-worm {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  animation: none;
+  transform: translateX(-50%) translateY(0);
+}
+
+#footprints-floating-bunny:not(.fp-chew-active) .fp-owl-worm-sway {
+  animation: none;
+  transform: none;
+}
+
+#footprints-floating-bunny.fp-chew-active .fp-owl-worm {
+  visibility: visible;
+  opacity: 1;
+  transition: opacity 0.45s ease;
+}
+
+#footprints-floating-bunny .fp-owl-worm-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+@keyframes fpOwlWormHang {
+  0%,
+  7% {
+    transform: translateX(-50%) translateY(0);
+  }
+  8%,
+  18% {
+    transform: translateX(-50%) translateY(-1px);
+  }
+  19%,
+  74% {
+    transform: translateX(-50%) translateY(-2px);
+  }
+  78%,
+  100% {
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+@keyframes fpOwlWormDangle {
+  0%,
+  100% {
+    transform: rotate(-6deg);
+  }
+  25% {
+    transform: rotate(5deg);
+  }
+  50% {
+    transform: rotate(-4deg);
+  }
+  75% {
+    transform: rotate(6deg);
+  }
+}
+
+/* Fox FAB: berries in the green grass band, left and right of the fox (not centered in front). */
+#footprints-floating-bunny .fp-floating-grass-wrap .fp-fox-berries-wrap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+#footprints-floating-bunny .fp-floating-grass-wrap .fp-fox-berry-cluster--left {
+  position: absolute;
+  left: 1px;
+  bottom: 0;
+  width: 24px;
+  height: 30px;
+}
+
+#footprints-floating-bunny .fp-floating-grass-wrap .fp-fox-berry-cluster--right {
+  position: absolute;
+  right: 1px;
+  bottom: 1px;
+  width: 24px;
+  height: 30px;
+}
+
+#footprints-floating-bunny .fp-fox-berry-cluster-inner {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.15));
+}
+
+#footprints-floating-bunny:not(.fp-chew-active) .fp-fox-berries-wrap {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+#footprints-floating-bunny:not(.fp-chew-active) .fp-fox-berry-cluster-inner {
+  animation: none;
+}
+
+#footprints-floating-bunny.fp-chew-active .fp-fox-berries-wrap {
+  visibility: visible;
+  opacity: 1;
+  transition: opacity 0.4s ease;
+}
+
+#footprints-floating-bunny.fp-chew-active .fp-fox-berries-wrap .fp-fox-berry-cluster-inner {
+  animation: fpFoxBerryPop 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+#footprints-floating-bunny.fp-chew-active .fp-fox-berry-cluster--right .fp-fox-berry-cluster-inner {
+  animation-delay: 0.05s;
+}
+
+#footprints-floating-bunny .fp-fox-berry-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+@keyframes fpFoxBerryPop {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.88);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Raccoon FAB: trash heap + bag behind the mascot, only while scroll-chew is active. */
+#footprints-floating-bunny .fp-raccoon-trash-heap {
+  position: absolute;
+  left: 50%;
+  bottom: 10px;
+  width: 138%;
+  max-height: 54%;
+  margin-left: 0;
+  z-index: 0;
+  transform: translateX(-50%);
+  pointer-events: none;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+#footprints-floating-bunny .fp-raccoon-trash-heap-inner {
+  width: 100%;
+  max-height: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  filter: drop-shadow(0 1px 3px rgba(15, 25, 18, 0.24));
+}
+
+#footprints-floating-bunny .fp-raccoon-trash-heap-img {
+  width: 100%;
+  height: auto;
+  max-height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+  display: block;
+  pointer-events: none;
+}
+
+#footprints-floating-bunny:not(.fp-chew-active) .fp-raccoon-trash-heap {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+#footprints-floating-bunny:not(.fp-chew-active) .fp-raccoon-trash-heap-inner {
+  animation: none;
+}
+
+#footprints-floating-bunny.fp-chew-active .fp-raccoon-trash-heap {
+  visibility: visible;
+  opacity: 1;
+  transition: opacity 0.4s ease;
+}
+
+#footprints-floating-bunny.fp-chew-active .fp-raccoon-trash-heap-inner {
+  animation: fpRaccoonTrashHeapPop 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes fpRaccoonTrashHeapPop {
+  from {
+    opacity: 0;
+    transform: translateY(5px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fpBunnyBiteBob {
+  0%, 3.5% {
+    transform: translateY(0);
+  }
+  5.5% {
+    transform: translateY(1px);
+  }
+  7% {
+    transform: translateY(3px);
+  }
+  9% {
+    transform: translateY(1px);
+  }
+  10.5% {
+    transform: translateY(0);
+  }
+  10.5%, 14% {
+    transform: translateY(0);
+  }
+  16% {
+    transform: translateY(1px);
+  }
+  17.5% {
+    transform: translateY(3px);
+  }
+  19.5% {
+    transform: translateY(1px);
+  }
+  21% {
+    transform: translateY(0);
+  }
+  21%, 26% {
+    transform: translateY(0);
+  }
+  27.5% {
+    transform: translateY(1px);
+  }
+  29.2% {
+    transform: translateY(3px);
+  }
+  31% {
+    transform: translateY(1px);
+  }
+  32.5% {
+    transform: translateY(0);
+  }
+  32.5%, 100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes fpCarrotLift {
+  0%, 7% {
+    transform: translateX(-50%) translateY(0);
+  }
+  /* After first bite */
+  8%, 18% {
+    transform: translateX(-50%) translateY(-1px);
+  }
+  /* After second bite (no extra lift after third bite) */
+  19%, 74% {
+    transform: translateX(-50%) translateY(-2px);
+  }
+  /* Regrow: back to mouth height */
+  78%, 100% {
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+@keyframes fpCarrotBitten {
+  0%, 4% {
+    clip-path: polygon(
+      0% 0%,
+      8.33% 0%,
+      16.66% 0%,
+      25% 0%,
+      33.33% 0%,
+      41.66% 0%,
+      50% 0%,
+      58.33% 0%,
+      66.66% 0%,
+      75% 0%,
+      83.33% 0%,
+      91.66% 0%,
+      100% 0%,
+      100% 100%,
+      0% 100%
+    );
+    transform: rotate(0deg);
+  }
+  5.5% {
+    clip-path: polygon(
+      0% 0%,
+      8.33% 0%,
+      16.66% 0%,
+      25% 0%,
+      33.33% 0%,
+      41.66% 0%,
+      50% 0%,
+      58.33% 0%,
+      66.66% 0%,
+      75% 0%,
+      83.33% 0%,
+      91.66% 0%,
+      100% 0%,
+      100% 100%,
+      0% 100%
+    );
+    transform: rotate(-3deg);
+  }
+  /* First bite: diagonal gnaw plane */
+  7% {
+    clip-path: polygon(
+      0% 6.5%,
+      8.33% 7.8%,
+      16.66% 9.5%,
+      25% 11.2%,
+      33.33% 7.8%,
+      41.66% 10.8%,
+      50% 13.5%,
+      58.33% 12.5%,
+      66.66% 9.8%,
+      75% 12.2%,
+      83.33% 10%,
+      91.66% 11%,
+      100% 12.5%,
+      100% 100%,
+      0% 100%
+    );
+    transform: skewX(-2.2deg) rotate(1deg);
+  }
+  8%, 15% {
+    clip-path: polygon(
+      0% 6.5%,
+      8.33% 7.8%,
+      16.66% 9.5%,
+      25% 11.2%,
+      33.33% 7.8%,
+      41.66% 10.8%,
+      50% 13.5%,
+      58.33% 12.5%,
+      66.66% 9.8%,
+      75% 12.2%,
+      83.33% 10%,
+      91.66% 11%,
+      100% 12.5%,
+      100% 100%,
+      0% 100%
+    );
+    transform: skewX(-2.2deg) rotate(0deg);
+  }
+  16.5% {
+    clip-path: polygon(
+      0% 6.5%,
+      8.33% 7.8%,
+      16.66% 9.5%,
+      25% 11.2%,
+      33.33% 7.8%,
+      41.66% 10.8%,
+      50% 13.5%,
+      58.33% 12.5%,
+      66.66% 9.8%,
+      75% 12.2%,
+      83.33% 10%,
+      91.66% 11%,
+      100% 12.5%,
+      100% 100%,
+      0% 100%
+    );
+    transform: skewX(-2.2deg) rotate(-2.8deg);
+  }
+  /* Second bite: same diagonal gnaw, +10.5% */
+  18% {
+    clip-path: polygon(
+      0% 17%,
+      8.33% 18.3%,
+      16.66% 20%,
+      25% 21.7%,
+      33.33% 18.3%,
+      41.66% 21.3%,
+      50% 24%,
+      58.33% 23%,
+      66.66% 20.3%,
+      75% 22.7%,
+      83.33% 20.5%,
+      91.66% 21.5%,
+      100% 23%,
+      100% 100%,
+      0% 100%
+    );
+    transform: skewX(-2.2deg) rotate(0.9deg);
+  }
+  19%, 27% {
+    clip-path: polygon(
+      0% 17%,
+      8.33% 18.3%,
+      16.66% 20%,
+      25% 21.7%,
+      33.33% 18.3%,
+      41.66% 21.3%,
+      50% 24%,
+      58.33% 23%,
+      66.66% 20.3%,
+      75% 22.7%,
+      83.33% 20.5%,
+      91.66% 21.5%,
+      100% 23%,
+      100% 100%,
+      0% 100%
+    );
+    transform: skewX(-2.2deg) rotate(0deg);
+  }
+  28.5% {
+    clip-path: polygon(
+      0% 17%,
+      8.33% 18.3%,
+      16.66% 20%,
+      25% 21.7%,
+      33.33% 18.3%,
+      41.66% 21.3%,
+      50% 24%,
+      58.33% 23%,
+      66.66% 20.3%,
+      75% 22.7%,
+      83.33% 20.5%,
+      91.66% 21.5%,
+      100% 23%,
+      100% 100%,
+      0% 100%
+    );
+    transform: skewX(-2.2deg) rotate(-2.8deg);
+  }
+  /* Third bite: same diagonal gnaw, +21% */
+  30% {
+    clip-path: polygon(
+      0% 27.5%,
+      8.33% 28.8%,
+      16.66% 30.5%,
+      25% 32.2%,
+      33.33% 28.8%,
+      41.66% 31.8%,
+      50% 34.5%,
+      58.33% 33.5%,
+      66.66% 30.8%,
+      75% 33.2%,
+      83.33% 31%,
+      91.66% 32%,
+      100% 33.5%,
+      100% 100%,
+      0% 100%
+    );
+    transform: skewX(-2.2deg) rotate(0.9deg);
+  }
+  31%, 70% {
+    clip-path: polygon(
+      0% 27.5%,
+      8.33% 28.8%,
+      16.66% 30.5%,
+      25% 32.2%,
+      33.33% 28.8%,
+      41.66% 31.8%,
+      50% 34.5%,
+      58.33% 33.5%,
+      66.66% 30.8%,
+      75% 33.2%,
+      83.33% 31%,
+      91.66% 32%,
+      100% 33.5%,
+      100% 100%,
+      0% 100%
+    );
+    transform: skewX(-2.2deg) rotate(0deg);
+  }
+  74% {
+    clip-path: polygon(
+      0% 27.5%,
+      8.33% 28.8%,
+      16.66% 30.5%,
+      25% 32.2%,
+      33.33% 28.8%,
+      41.66% 31.8%,
+      50% 34.5%,
+      58.33% 33.5%,
+      66.66% 30.8%,
+      75% 33.2%,
+      83.33% 31%,
+      91.66% 32%,
+      100% 33.5%,
+      100% 100%,
+      0% 100%
+    );
+    transform: skewX(-2.2deg) rotate(0deg);
+  }
+  78%, 80%, 100% {
+    clip-path: polygon(
+      0% 0%,
+      8.33% 0%,
+      16.66% 0%,
+      25% 0%,
+      33.33% 0%,
+      41.66% 0%,
+      50% 0%,
+      58.33% 0%,
+      66.66% 0%,
+      75% 0%,
+      83.33% 0%,
+      91.66% 0%,
+      100% 0%,
+      100% 100%,
+      0% 100%
+    );
+    transform: rotate(0deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #footprints-floating-bunny.fp-chew-active .fp-chew-stage {
+    animation: none;
+  }
+  #footprints-floating-bunny .fp-chew-carrot-sway {
+    animation: none;
+    clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+    transform: none;
+  }
+  #footprints-floating-bunny .fp-chew-carrot {
+    animation: none;
+    transform: translateX(-50%);
+  }
+  #footprints-floating-bunny .fp-owl-worm {
+    animation: none;
+    transform: translateX(-50%);
+  }
+  #footprints-floating-bunny .fp-owl-worm-sway {
+    animation: none;
+    transform: none;
+  }
+  #footprints-floating-bunny .fp-fox-berry-cluster-inner {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+  #footprints-floating-bunny .fp-raccoon-trash-heap-inner {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
